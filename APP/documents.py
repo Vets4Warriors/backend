@@ -8,7 +8,8 @@ class Rating(db.EmbeddedDocument):
         Ratings can get more complex. For now
     """
     value = db.IntField(min_value=0, max_value=5)
-    user = db.StringField()
+    user = db.StringField(max_length=255)
+    comment = db.StringField(required=False)
 
 
 class Address(db.EmbeddedDocument):

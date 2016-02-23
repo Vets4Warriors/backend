@@ -1,8 +1,9 @@
 """
 
 """
-from flask import jsonify, make_response
-from APP import app, db, stathat
+from flask import jsonify, make_response, request
+from APP import app, db, stathat, api
+from APP.resources import Location, LocationList
 
 
 @app.route('/')
@@ -11,12 +12,8 @@ def index():
     return make_response(jsonify(response="This is Vets 4 Warriors!"), 200)
 
 
-# Add a resource
-@app.route('/locations', methods=['POST'])
-def add_location():
-    return make_response(jsonify(response="All good"), 200)
-
-#
+api.add_resource(LocationList, '/locations')
+api.add_resource(Location, '/locations/<string:loc_id>')
 
 
 @app.errorhandler(404)

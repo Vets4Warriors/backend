@@ -1,24 +1,40 @@
-from flask_mongorest.resources import Resource
-from flask_mongorest import operators as ops
+from flask import request
+from flask_restful import Resource
+from flask_restful_swagger import swagger
 
-import APP.documents as docs
-
-
-class AddressResource(Resource):
-    document = docs.Address
+from APP.documents import Location as LocDoc
 
 
-class LocationResource(Resource):
+class Location(Resource):
     """
 
     """
-    document = docs.Location
+    @swagger.operation(
 
-    related_resources = {
-        'address': AddressResource
-    }
+    )
+    def get(self, loc_id):
+        """
 
-    filters = {
-        'name': [ops.Startswith, ops.Exact]
-    }
+        :return:
+        """
 
+        return {"hi": "hi"}, 200
+
+    def put(self):
+        return "", 201
+
+    def post(self):
+        """
+        Add a location
+        :return:
+        """
+        return "", 201
+
+    def delete(self):
+        return "", 204
+
+
+class LocationList(Resource):
+    def get(self):
+        locations = LocDoc.objects()
+        return locations, 200
