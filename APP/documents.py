@@ -93,9 +93,6 @@ class Location(db.Document):
     addedBy = db.StringField()
     addedDate = db.DateTimeField(default=datetime.utcnow)
 
-    # def to_json(self):
-    #     return super.to_json()
-
     def to_json(self):
         locJson = json.loads(super(Location, self).to_json())
         locJson['rating'] = self.get_rating()

@@ -15,17 +15,6 @@ class LocationRating(Resource):
     """
 
     """
-
-    @swagger.operation()
-    def get(self, locId):
-        """
-
-        :param locId:
-        :return:
-        """
-        location = LocDoc.objects.get(id=locId)
-        return location.ratings, 200
-
     @swagger.operation()
     def post(self, locId):
         """
@@ -36,6 +25,7 @@ class LocationRating(Resource):
 
         location = LocDoc.objects.get(id=locId)
         try:
+            # Validation errors are caught by Flask if they are raised
             rating = RateDoc.from_data(request.get_json(), validate=True)
         except (TypeError, KeyError) as ex:
             abort(400)
@@ -55,7 +45,7 @@ class Location(Resource):
             Get a Location by object id
         """
         location = LocDoc.objects.get(id=locId)
-        stathat.count('location_get', 1)
+        stathat.count('location_get ' + str(location.id), 1)
         return location.to_json(), 200
 
     @swagger.operation()
@@ -66,8 +56,29 @@ class Location(Resource):
         # First find the Location
         location = LocDoc.objects.get(id=locId)
         # Todo: Then update it!
+        # In order to update by specific key, would have to do a lot of conditionals
+        # So just don't. Or do later.
+        try:
+            updatedLocation = LocDoc.from_data(request.get_json(), validate=True)
+        except (TypeError, KeyError) as ex:
+            abort(400)
 
-        stathat.count('location_put', 1)
+        location.update(
+            name=updatedLocation.name,
+            address=updatedLocation.address,
+            hqAddress=updatedLocation.hqAddress,
+            website=updatedLocation.website,
+            phone=updatedLocation.phone,
+            email=updatedLocation.email,
+            locationType=updatedLocation.locationType,
+            coverage=updatedLocation.coverage,
+            services=updatedLocation.services,
+            tags=updatedLocation.tags,
+            comments=updatedLocation.comments
+        )
+        # Will eventually do update logs/diffs
+
+        stathat.count('location_put: ' + str(location.id), 1)
         return location.to_json(), 201
 
     @swagger.operation()
@@ -77,7 +88,7 @@ class Location(Resource):
         """
         location = LocDoc.objects.get(id=locId)
         location.delete()
-        stathat.count('location_delete', 1)
+        stathat.count('location_delete ' + str(location.id), 1)
         return '', 204  # No Content Return
 
 
