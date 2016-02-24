@@ -1,0 +1,30 @@
+{
+  "name":"Baja Mexican Grill",
+  "address": {
+    "address1":"104 14th Street",
+    "address2":"Apt 1",
+    "city": "Hoboken",
+    "state": "NJ",
+    "country": "USA",
+    "zipcode": "07030",
+    "latLng": [40.0, -73.1]
+  },
+  "hqAddress": {
+    "address1":"104 14th Street",
+    "address2":"Apt 1",
+    "city": "Hoboken",
+    "state": "NJ",
+    "country": "USA",
+    "zipcode": "07030",
+    "latLng": [40.0, -73.1]
+  },
+  "website": "http://www.google.com",
+  "phone": "test",
+  "email": "austin.cawley@gmail.com",
+  "locationType": "hola",
+  "coverage": ["National", "International"],
+  "services": [],
+  "tags": [],
+  "comments": "test",
+  "addedBy": "Bob"
+}

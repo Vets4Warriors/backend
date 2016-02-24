@@ -1,6 +1,11 @@
-from APP import db
+"""
+    Defines the Schemas for each resource in MongoEngine Terms
+"""
 
+import json
 from datetime import datetime
+
+from APP import db
 
 
 class Rating(db.EmbeddedDocument):
@@ -24,14 +29,34 @@ class Address(db.EmbeddedDocument):
     zipcode = db.StringField(max_length=10)
     latLng = db.PointField()
 
+    @staticmethod
+    def from_data(data):
+        """
+        :raises: TypeError
+        :raises: KeyError
+        :param data:
+        :return:
+        """
+        address = Address(
+                address1=data['address1'],
+                address2=data['address2'],
+                city=data['city'],
+                state=data['state'],
+                country=data['country'],
+                zipcode=data['zipcode'],
+                latLng=data['latLng']
+        )
+
+        return address
+
 
 class Location(db.Document):
     """
         Represents a Veteran Aid Location
     """
-    name = db.StringField(max_length=255)
+    name = db.StringField(max_length=255, unique=True)
     address = db.EmbeddedDocumentField(Address)
-    hqLocation = db.EmbeddedDocumentField(Address)
+    hqAddress = db.EmbeddedDocumentField(Address)
     website = db.URLField()
     phone = db.StringField(max_length=11)
     email = db.EmailField()
@@ -48,6 +73,14 @@ class Location(db.Document):
     addedBy = db.StringField()
     addedDate = db.DateTimeField(default=datetime.utcnow)
 
+    # def to_json(self):
+    #     return super.to_json()
+
+    def to_json(self):
+        locJson = json.loads(super(Location, self).to_json())
+        locJson['rating'] = self.get_rating()
+        return json.dumps(locJson)
+
     def get_rating(self):
         """
             Gets the average rating from all ratings
@@ -57,4 +90,48 @@ class Location(db.Document):
         for r in self.ratings:
             sum += r.value
 
-        return sum / len(self.ratings)
+        numRatings = len(self.ratings)
+
+        return sum / numRatings if numRatings != 0 else 0
+
+    @staticmethod
+    def from_data(data, validate=False):
+        """
+            Builds a LocDoc from a json dictionary
+        :param jsonData: dict
+        :return: APP.documents.Location
+        """
+        # Could get more intense about validation/formatting data
+        # Will see if the users mess it up enough / harder on the front end
+        address = Address.from_data(data['address'])
+        if validate:
+            # This might be called when the Document this is Embedded in is validated
+            # Should look into that
+            address.validate()
+
+        # Not required
+        hqAddress = None
+        if 'hqAddress' in data:
+            hqAddress = Address.from_data(data['hqAddress'])
+            if validate:
+                hqAddress.validate()
+
+        location = Location(
+            name=data['name'],
+            address=address,
+            hqAddress=hqAddress,
+            website=data['website'],
+            phone=data['phone'],
+            email=data['email'],
+            locationType=data['locationType'],
+            coverage=data['coverage'],
+            services=data['services'],
+            tags=data['tags'],
+            comments=data['comments'],
+            addedBy=data['addedBy']
+        )
+        if validate:
+            location.validate()
+
+        return location
+

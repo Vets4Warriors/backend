@@ -1,5 +1,5 @@
 """
-
+    Initializes the app
 """
 from flask import Flask
 from flask_restful import Api
@@ -20,6 +20,7 @@ db = MongoEngine(app)
 stathat = StatHat(app)
 api = Api(app)
 
+# Loads our routes
 from APP import routes
 
 if __name__ == '__main__':
