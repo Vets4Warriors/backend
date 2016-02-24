@@ -3,7 +3,7 @@
 """
 from flask import jsonify, make_response, request
 from APP import app, db, stathat, api
-from APP.resources import Location, LocationList
+from APP.resources import Location, LocationList, LocationRating
 from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError
 
 
@@ -14,6 +14,7 @@ def index():
 
 api.add_resource(LocationList, '/locations')
 api.add_resource(Location, '/locations/<string:locId>')
+api.add_resource(LocationRating, '/locations/rate/<string:locId>')
 
 
 @app.errorhandler(NotUniqueError)
@@ -26,7 +27,7 @@ def mongo_error(error):
 
 
 @app.errorhandler(400)
-def bad_req():
+def bad_req(error):
     return make_response(jsonify(error="Bad Request"), 400)
 
 

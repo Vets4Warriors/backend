@@ -8,6 +8,41 @@ from flask_restful_swagger import swagger
 from APP import stathat
 from APP.documents import Location as LocDoc
 from APP.documents import Address as AddrDoc
+from APP.documents import Rating as RateDoc
+
+
+class LocationRating(Resource):
+    """
+
+    """
+
+    @swagger.operation()
+    def get(self, locId):
+        """
+
+        :param locId:
+        :return:
+        """
+        location = LocDoc.objects.get(id=locId)
+        return location.ratings, 200
+
+    @swagger.operation()
+    def post(self, locId):
+        """
+
+        :param locId:
+        :return:
+        """
+
+        location = LocDoc.objects.get(id=locId)
+        try:
+            rating = RateDoc.from_data(request.get_json(), validate=True)
+        except (TypeError, KeyError) as ex:
+            abort(400)
+
+        location.update(push__ratings=rating)
+        location.save()
+        return location.to_json(), 201
 
 
 class Location(Resource):
@@ -19,7 +54,7 @@ class Location(Resource):
         """
             Get a Location by object id
         """
-        location = LocDoc.objects.get(id=str(locId))
+        location = LocDoc.objects.get(id=locId)
         stathat.count('location_get', 1)
         return location.to_json(), 200
 
@@ -67,13 +102,14 @@ class LocationList(Resource):
         """
             Add a Location
         """
-        location = LocDoc.from_data(request.get_json(), validate=True)
 
-        if location is None:
+        try:
+            location = LocDoc.from_data(request.get_json(), validate=True)
+        except (TypeError, KeyError) as ex:
             abort(400)
 
         location.get_rating()
-        x = location.to_json()
+        location.to_json()
         location.save()
 
         stathat.count('location_post', 1)

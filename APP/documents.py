@@ -16,6 +16,24 @@ class Rating(db.EmbeddedDocument):
     user = db.StringField(max_length=255)
     comment = db.StringField(required=False)
 
+    @staticmethod
+    def from_data(data, validate=False):
+        """
+
+        :param data:
+        :return: Rating
+        """
+        rating = Rating(
+            value=data['value'],
+            user=data['user'],
+            comment=data['comment']
+        )
+
+        if validate:
+            rating.validate()
+
+        return rating
+
 
 class Address(db.EmbeddedDocument):
     """
@@ -30,12 +48,12 @@ class Address(db.EmbeddedDocument):
     latLng = db.PointField()
 
     @staticmethod
-    def from_data(data):
+    def from_data(data, validate=False):
         """
         :raises: TypeError
         :raises: KeyError
         :param data:
-        :return:
+        :return: Address
         """
         address = Address(
                 address1=data['address1'],
@@ -46,6 +64,8 @@ class Address(db.EmbeddedDocument):
                 zipcode=data['zipcode'],
                 latLng=data['latLng']
         )
+        if validate:
+            address.validate()
 
         return address
 
@@ -103,18 +123,12 @@ class Location(db.Document):
         """
         # Could get more intense about validation/formatting data
         # Will see if the users mess it up enough / harder on the front end
-        address = Address.from_data(data['address'])
-        if validate:
-            # This might be called when the Document this is Embedded in is validated
-            # Should look into that
-            address.validate()
+        address = Address.from_data(data['address'], validate=validate)
 
         # Not required
         hqAddress = None
         if 'hqAddress' in data:
-            hqAddress = Address.from_data(data['hqAddress'])
-            if validate:
-                hqAddress.validate()
+            hqAddress = Address.from_data(data['hqAddress'], validate=validate)
 
         location = Location(
             name=data['name'],
@@ -128,7 +142,7 @@ class Location(db.Document):
             services=data['services'],
             tags=data['tags'],
             comments=data['comments'],
-            addedBy=data['addedBy']
+            addedBy=data['user']
         )
         if validate:
             location.validate()
