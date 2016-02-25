@@ -4,6 +4,7 @@
 """
 from flask import Flask
 from flask_restful import Api
+from flask_restful_swagger import swagger
 from flask_mongoengine import MongoEngine
 from flask_stathat import StatHat
 
@@ -19,7 +20,7 @@ app.config['STATHAT_EZ_KEY'] = 'o3OaE05mySW3g9RH'
 
 db = MongoEngine(app)
 stathat = StatHat(app)
-api = Api(app)
+api = swagger.docs(Api(app), apiVersion='0.1')
 
 # Loads our routes
 from app import routes

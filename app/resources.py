@@ -15,7 +15,31 @@ class LocationRating(Resource):
         Ratings for Locations.
         In future can be used for any type of rating.
     """
-    @swagger.operation()
+    @swagger.operation(
+        notes="Rate a location",
+        responseClass=LocDoc.__name__,
+        nickname="rate",
+        parameters=[
+            {
+                "name": "body",
+                "description": "Everything we need for a location",
+                "required": True,
+                "allowMultiple": False,
+                "dataType": "json",
+                "paramType": "body"
+            }
+        ],
+        responseMesssage=[
+            {
+                "code": 201,
+                "message": "Created and stored the rating!"
+            },
+            {
+                "code": 400,
+                "message": "Some part of the body data was malformed!"
+            }
+        ]
+    )
     def post(self, locId):
         """
 
@@ -40,7 +64,20 @@ class Location(Resource):
     """
         The individual Location
     """
-    @swagger.operation()
+    @swagger.operation(
+        responseClass=LocDoc.__name__,
+        nickname="get",
+        responseMessages=[
+            {
+                "code": 201,
+                "message": "Created and returned."
+            },
+            {
+                "code": 404,
+                "message": "No location with that id"
+            }
+        ]
+    )
     def get(self, locId):
         """
             Get a Location by object id
@@ -49,14 +86,102 @@ class Location(Resource):
         stathat.count('location_get ' + str(location.id), 1)
         return location.to_json(), 200
 
-    @swagger.operation()
+    @swagger.operation(
+        responseClass=LocDoc.__name__,
+        nickname="update",
+        parameters=[
+            {
+                "name": "name",
+                "description": "In body",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "website",
+                "description": "In body. Must follow http:// full format",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "phone",
+                "description": "In body",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "email",
+                "description": "In body. Must be a valid email address.",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "locationType",
+                "description": "In body",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "coverage",
+                "description": "In body. choices=['International', 'National', 'Regional', 'State', 'Local']",
+                "required": True,
+                "dataType": "list of strings",
+                "paramType": "body"
+            },
+            {
+                "name": "services",
+                "description": "In body.",
+                "required": True,
+                "dataType": "list of strings",
+                "paramType": "body"
+            },
+            {
+                "name": "tags",
+                "description": "In body.",
+                "required": True,
+                "dataType": "list of strings",
+                "paramType": "body"
+            },
+            {
+                "name": "comments",
+                "description": "In body.",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "user",
+                "description": "In body. The person who adds this!",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            }
+        ],
+        responseMesssage=[
+            {
+                "code": 201,
+                "message": "Updated the location!"
+            },
+            {
+                "code": 400,
+                "message": "Some part of the body data was malformed!"
+            },
+            {
+                "code": 404,
+                "message": "No location with that id."
+            }
+        ]
+    )
     def put(self, locId):
         """
             Update a Location
         """
         # First find the Location
         location = LocDoc.objects.get(id=locId)
-        # Todo: Then update it!
         # In order to update by specific key, would have to do a lot of conditionals
         # So just don't. Or do later.
         try:
@@ -82,7 +207,24 @@ class Location(Resource):
         stathat.count('location_put: ' + str(location.id), 1)
         return location.to_json(), 201
 
-    @swagger.operation()
+    @swagger.operation(
+        notes="Delete a location",
+        nickname="delete",
+        responseMesssage=[
+            {
+                "code": 204,
+                "message": "Location deleted!"
+            },
+            {
+                "code": 400,
+                "message": "Some part of the body data was malformed!"
+            },
+            {
+                "code": 404,
+                "message": "No location with that id."
+            }
+        ]
+    )
     def delete(self, locId):
         """
             Delete a Location
@@ -101,10 +243,6 @@ class LocationList(Resource):
 
     def __init__(self):
         super(LocationList, self).__init__()
-        self.queryArgsKeys = [
-            'name', 'website', 'phone', 'email',
-            'locationType', 'coverage', 'services', 'tags'
-        ]
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('name', type=str)
         self.parser.add_argument('lat', type=float)
@@ -121,7 +259,102 @@ class LocationList(Resource):
         self.parser.add_argument('services', type=str, action='append')
         self.parser.add_argument('tags', type=str, action='append')
 
-    @swagger.operation()
+    @swagger.operation(
+        responseClass="List of: " + LocDoc.__name__,
+        nickname="query all locations",
+        parameters=[
+            {
+                "name": "name",
+                "description": "In body",
+                "required": False,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "lat",
+                "description": "In body. Co-req: lng, rangeMeters",
+                "required": False,
+                "dataType": "float",
+                "paramType": "queryString"
+            },
+            {
+                "name": "lng",
+                "description": "In body. Co-req: lat, rangeMeters",
+                "required": False,
+                "dataType": "float",
+                "paramType": "queryString"
+            },
+            {
+                "name": "rangeMeters",
+                "description": "In body. Co-req: lat, lng",
+                "required": False,
+                "dataType": "float",
+                "paramType": "queryString"
+            },
+            {
+                "name": "website",
+                "description": "In body.",
+                "required": False,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "phone",
+                "description": "In body.",
+                "required": False,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "email",
+                "description": "In body. Valid email format.",
+                "required": False,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "locationType",
+                "description": "In body.",
+                "required": False,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "coverage",
+                "description": "In body. Choices=['International', 'National', 'Regional', 'State', 'Local']",
+                "required": False,
+                "allowMultiple": True,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "services",
+                "description": "In body.",
+                "required": False,
+                "allowMultiple": True,
+                "dataType": "string",
+                "paramType": "queryString"
+            },
+            {
+                "name": "tags",
+                "description": "In body.",
+                "required": False,
+                "allowMultiple": True,
+                "dataType": "string",
+                "paramType": "queryString"
+            }
+        ],
+        responseMessages=[
+            {
+                "code": 200,
+                "message": "Successful request, check the response"
+            },
+            {
+                "code": 400,
+                "message": "One of your parameters was probably of an incorrect type."
+            }
+        ]
+    )
     def get(self):
         """
             Just get the list of all the Locations
@@ -131,7 +364,8 @@ class LocationList(Resource):
 
         #  Grabs keys out of the args that we want to query by
         # Will do dynamic later
-        # I think it will entail a custome Query
+        # I think it will entail a custom QuerySet
+
         # queryArgs = {}
         # for key in args:
         #     if key is not None and key in self.queryArgsKeys:
@@ -162,14 +396,99 @@ class LocationList(Resource):
                     locations = locations.filter(tags__in=args[key])
 
         # Do a range search if there
-        if 'rangeMeters' in args:
+        if args['rangeMeters'] != 0:
             locations = locations.filter(address__latLng__near=[args['lat'], args['lng']],
                                          address__latLng__max_distance=args['rangeMeters'])
 
         stathat.count('location_get_all', 1)
         return locations.to_json(), 200
 
-    @swagger.operation()
+    @swagger.operation(
+        responseClass=LocDoc.__name__,
+        nickname="create",
+        parameters=[
+            {
+                "name": "name",
+                "description": "In body",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "website",
+                "description": "In body. Must follow http:// full format",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "phone",
+                "description": "In body",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "email",
+                "description": "In body. Must be a valid email address.",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "locationType",
+                "description": "In body",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "coverage",
+                "description": "In body. choices=['International', 'National', 'Regional', 'State', 'Local']",
+                "required": True,
+                "dataType": "list of strings",
+                "paramType": "body"
+            },
+            {
+                "name": "services",
+                "description": "In body.",
+                "required": True,
+                "dataType": "list of strings",
+                "paramType": "body"
+            },
+            {
+                "name": "tags",
+                "description": "In body.",
+                "required": True,
+                "dataType": "list of strings",
+                "paramType": "body"
+            },
+            {
+                "name": "comments",
+                "description": "In body.",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            },
+            {
+                "name": "user",
+                "description": "In body. The person who adds this!",
+                "required": True,
+                "dataType": "string",
+                "paramType": "body"
+            }
+        ],
+        responseMesssage=[
+            {
+                "code": 201,
+                "message": "Created the location! Should be sent back in the response."
+            },
+            {
+                "code": 400,
+                "message": "Some part of the body data was malformed!"
+            }
+        ]
+    )
     def post(self):
         """
             Add a Location
