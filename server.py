@@ -1,6 +1,10 @@
+"""
+    Wraps the flask app in a tornado server. Tornado is fast too.
+    Can handle tons of open connections all at once.
+"""
 __author__ = 'austin'
 
-from APP import app as api
+from app import app as api
 
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop
@@ -10,14 +14,16 @@ import tornado.options
 
 class MainHandler(RequestHandler):
     def get(self):
-        tornado.options.define_logging_options()
+        self.write("Y u want our tornado huh")
 
-tr = WSGIContainer(api)
+flask = WSGIContainer(api)
 
 application = Application(
     [
+        #
         (r"/tornado", MainHandler),
-        (r".*", FallbackHandler, dict(fallback=tr)),
+        # Send all others to flask
+        (r".*", FallbackHandler, dict(fallback=flask)),
     ]
 )
 

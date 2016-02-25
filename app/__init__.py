@@ -1,5 +1,6 @@
 """
     Initializes the app
+    Some people use another file for this. Call it app.py they say. Nah.
 """
 from flask import Flask
 from flask_restful import Api
@@ -21,7 +22,7 @@ stathat = StatHat(app)
 api = Api(app)
 
 # Loads our routes
-from APP import routes
+from app import routes
 
 if __name__ == '__main__':
     app.run(port=5000)

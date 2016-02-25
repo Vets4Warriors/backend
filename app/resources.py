@@ -2,18 +2,18 @@
     Defining the Resources of the Rest
 """
 from flask import abort, request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from flask_restful_swagger import swagger
 
-from APP import stathat
-from APP.documents import Location as LocDoc
-from APP.documents import Address as AddrDoc
-from APP.documents import Rating as RateDoc
+from app import stathat
+from app.documents import Location as LocDoc
+from app.documents import Rating as RateDoc
 
 
 class LocationRating(Resource):
     """
-
+        Ratings for Locations.
+        In future can be used for any type of rating.
     """
     @swagger.operation()
     def post(self, locId):
@@ -32,6 +32,7 @@ class LocationRating(Resource):
 
         location.update(push__ratings=rating)
         location.save()
+        location.reload()
         return location.to_json(), 201
 
 
@@ -98,13 +99,73 @@ class LocationList(Resource):
         Can either get all or add a new Location to the set
     """
 
+    def __init__(self):
+        super(LocationList, self).__init__()
+        self.queryArgsKeys = [
+            'name', 'website', 'phone', 'email',
+            'locationType', 'coverage', 'services', 'tags'
+        ]
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('name', type=str)
+        self.parser.add_argument('lat', type=float)
+        self.parser.add_argument('lng', type=float)
+        self.parser.add_argument('rangeMeters', type=float, default=0)
+        # May support these later
+        # self.parser.add_argument('hqLat', type=float)
+        # self.parser.add_argument('hqLng', type=float)
+        self.parser.add_argument('website', type=str)
+        self.parser.add_argument('phone', type=str)
+        self.parser.add_argument('email', type=str)
+        self.parser.add_argument('locationType', type=str)
+        self.parser.add_argument('coverage', type=str, action='append')
+        self.parser.add_argument('services', type=str, action='append')
+        self.parser.add_argument('tags', type=str, action='append')
+
     @swagger.operation()
     def get(self):
         """
             Just get the list of all the Locations
         """
-        # Todo: Parse the args and query parameters
-        locations = LocDoc.objects()
+        # Defaults: Get all
+        args = self.parser.parse_args()
+
+        #  Grabs keys out of the args that we want to query by
+        # Will do dynamic later
+        # I think it will entail a custome Query
+        # queryArgs = {}
+        # for key in args:
+        #     if key is not None and key in self.queryArgsKeys:
+        #         queryArgs[key] = args[key]
+        # allLocations = LocDoc.objects
+        # for arg in queryArgs:
+        #     allLocations = allLocations.filter(**{arg: queryArgs[arg]})
+
+        # Brute and lame approach
+        locations = LocDoc.objects
+        for key in args:
+            if args[key] is not None:
+                if key == 'name':
+                    locations = locations.filter(name__icontains=args[key])
+                elif key == 'website':
+                    locations = locations.filter(website__icontains=args[key])
+                elif key == 'phone':
+                    locations = locations.filter(phone__icontains=args[key])
+                elif key == 'email':
+                    locations = locations.filter(email__icontains=args[key])
+                elif key == 'locationType':
+                    locations = locations.filter(locationType__icontains=args[key])
+                elif key == 'coverage':
+                    locations = locations.filter(coverage__in=args[key])
+                elif key == 'services':
+                    locations = locations.filter(services__in=args[key])
+                elif key == 'tags':
+                    locations = locations.filter(tags__in=args[key])
+
+        # Do a range search if there
+        if 'rangeMeters' in args:
+            locations = locations.filter(address__latLng__near=[args['lat'], args['lng']],
+                                         address__latLng__max_distance=args['rangeMeters'])
+
         stathat.count('location_get_all', 1)
         return locations.to_json(), 200
 
@@ -113,7 +174,6 @@ class LocationList(Resource):
         """
             Add a Location
         """
-
         try:
             location = LocDoc.from_data(request.get_json(), validate=True)
         except (TypeError, KeyError) as ex:

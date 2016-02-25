@@ -5,7 +5,7 @@
 import json
 from datetime import datetime
 
-from APP import db
+from app import db
 
 
 class Rating(db.EmbeddedDocument):
@@ -116,7 +116,7 @@ class Location(db.Document):
         """
             Builds a LocDoc from a json dictionary
         :param jsonData: dict
-        :return: APP.documents.Location
+        :return: app.documents.Location
         """
         # Could get more intense about validation/formatting data
         # Will see if the users mess it up enough / harder on the front end

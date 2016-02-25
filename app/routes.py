@@ -1,9 +1,9 @@
 """
     Basic routes for our app, including status, index, resources, and error handlers
 """
-from flask import jsonify, make_response, request
-from APP import app, db, stathat, api
-from APP.resources import Location, LocationList, LocationRating
+from flask import jsonify, make_response
+from app import app, stathat, api
+from app.resources import Location, LocationList, LocationRating
 from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError
 
 
@@ -28,6 +28,7 @@ def mongo_error(error):
 
 @app.errorhandler(400)
 def bad_req(error):
+    stathat.count('400', 1)
     return make_response(jsonify(error="Bad Request"), 400)
 
 
