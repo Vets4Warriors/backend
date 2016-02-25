@@ -20,7 +20,13 @@ app.config['STATHAT_EZ_KEY'] = 'o3OaE05mySW3g9RH'
 
 db = MongoEngine(app)
 stathat = StatHat(app)
-api = swagger.docs(Api(app), apiVersion='0.1')
+
+# Generates beautiful swagger documents.
+# Available @ /api/spec.html
+api = swagger.docs(Api(app),
+                   description="The API for the Vets4Warriors online interface!",
+                   basePath='http://localhost:8000',
+                   apiVersion='0.1')
 
 # Loads our routes
 from app import routes

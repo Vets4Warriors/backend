@@ -23,10 +23,14 @@ class Rating(db.EmbeddedDocument):
         :param data:
         :return: Rating
         """
+        comment = None
+        if 'comment' in data:
+            comment = data['comment']
+
         rating = Rating(
             value=data['value'],
             user=data['user'],
-            comment=data['comment']
+            comment=comment
         )
 
         if validate:

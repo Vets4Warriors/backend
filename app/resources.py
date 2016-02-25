@@ -21,10 +21,23 @@ class LocationRating(Resource):
         nickname="rate",
         parameters=[
             {
-                "name": "body",
-                "description": "Everything we need for a location",
+                "name": "value",
+                "description": "The value. From [0,5]",
                 "required": True,
-                "allowMultiple": False,
+                "dataType": "json",
+                "paramType": "body"
+            },
+            {
+                "name": "user",
+                "description": "Who is rating",
+                "required": True,
+                "dataType": "json",
+                "paramType": "body"
+            },
+            {
+                "name": "comment",
+                "description": "Any extra comments",
+                "required": False,
                 "dataType": "json",
                 "paramType": "body"
             }
@@ -42,9 +55,7 @@ class LocationRating(Resource):
     )
     def post(self, locId):
         """
-
-        :param locId:
-        :return:
+            Rate a Location
         """
 
         location = LocDoc.objects.get(id=locId)
@@ -265,83 +276,83 @@ class LocationList(Resource):
         parameters=[
             {
                 "name": "name",
-                "description": "In body",
+                "description": "",
                 "required": False,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "lat",
-                "description": "In body. Co-req: lng, rangeMeters",
+                "description": " Co-req: lng, rangeMeters",
                 "required": False,
                 "dataType": "float",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "lng",
-                "description": "In body. Co-req: lat, rangeMeters",
+                "description": " Co-req: lat, rangeMeters",
                 "required": False,
                 "dataType": "float",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "rangeMeters",
-                "description": "In body. Co-req: lat, lng",
+                "description": " Co-req: lat, lng",
                 "required": False,
                 "dataType": "float",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "website",
-                "description": "In body.",
+                "description": "",
                 "required": False,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "phone",
-                "description": "In body.",
+                "description": "",
                 "required": False,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "email",
-                "description": "In body. Valid email format.",
+                "description": " Valid email format.",
                 "required": False,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "locationType",
-                "description": "In body.",
+                "description": "",
                 "required": False,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "coverage",
-                "description": "In body. Choices=['International', 'National', 'Regional', 'State', 'Local']",
+                "description": " Choices=['International', 'National', 'Regional', 'State', 'Local']",
                 "required": False,
                 "allowMultiple": True,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "services",
-                "description": "In body.",
+                "description": "",
                 "required": False,
                 "allowMultiple": True,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             },
             {
                 "name": "tags",
-                "description": "In body.",
+                "description": "",
                 "required": False,
                 "allowMultiple": True,
                 "dataType": "string",
-                "paramType": "queryString"
+                "paramType": "query"
             }
         ],
         responseMessages=[
@@ -357,7 +368,7 @@ class LocationList(Resource):
     )
     def get(self):
         """
-            Just get the list of all the Locations
+            Query all the locations
         """
         # Defaults: Get all
         args = self.parser.parse_args()
