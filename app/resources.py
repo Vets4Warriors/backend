@@ -6,8 +6,8 @@ from flask_restful import Resource, reqparse
 from flask_restful_swagger import swagger
 
 from app import stathat
-from app.documents import Location as LocDoc
-from app.documents import Rating as RateDoc
+from app.documents import Location as LocDoc, Rating as RateDoc, Address as AddrDoc
+from app.documents import LocationModel as LocMod, RatingModel as RateMod, AddressModel as AddrMod
 
 
 class LocationRating(Resource):
@@ -17,27 +17,13 @@ class LocationRating(Resource):
     """
     @swagger.operation(
         notes="Rate a location",
-        responseClass=LocDoc.__name__,
+        responseClass=LocMod.__name__,
         nickname="rate",
         parameters=[
             {
-                "name": "value",
-                "description": "The value. From [0,5]",
+                "name": "rating",
+                "description": "Rating from 1 to 5.",
                 "required": True,
-                "dataType": "json",
-                "paramType": "body"
-            },
-            {
-                "name": "user",
-                "description": "Who is rating",
-                "required": True,
-                "dataType": "json",
-                "paramType": "body"
-            },
-            {
-                "name": "comment",
-                "description": "Any extra comments",
-                "required": False,
                 "dataType": "json",
                 "paramType": "body"
             }
@@ -68,6 +54,7 @@ class LocationRating(Resource):
         location.update(push__ratings=rating)
         location.save()
         location.reload()
+        # Don't really need to send it back but whatevs
         return location.to_json(), 201
 
 
@@ -76,7 +63,7 @@ class Location(Resource):
         The individual Location
     """
     @swagger.operation(
-        responseClass=LocDoc.__name__,
+        responseClass=LocMod.__name__,
         nickname="get",
         responseMessages=[
             {
@@ -98,77 +85,16 @@ class Location(Resource):
         return location.to_json(), 200
 
     @swagger.operation(
-        responseClass=LocDoc.__name__,
+        notes="All these parameters should be in one json object in the body. If there is no data available, just leave"
+              " the field blank but make sure the key is still included.",
+        responseClass=LocMod.__name__,
         nickname="update",
         parameters=[
             {
-                "name": "name",
-                "description": "In body",
+                "name": "location",
+                "description": "Nested json in body. Be sure to read the model about what is required. HqAddr is not!",
                 "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "website",
-                "description": "In body. Must follow http:// full format",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "phone",
-                "description": "In body",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "email",
-                "description": "In body. Must be a valid email address.",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "locationType",
-                "description": "In body",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "coverage",
-                "description": "In body. choices=['International', 'National', 'Regional', 'State', 'Local']",
-                "required": True,
-                "dataType": "list of strings",
-                "paramType": "body"
-            },
-            {
-                "name": "services",
-                "description": "In body.",
-                "required": True,
-                "dataType": "list of strings",
-                "paramType": "body"
-            },
-            {
-                "name": "tags",
-                "description": "In body.",
-                "required": True,
-                "dataType": "list of strings",
-                "paramType": "body"
-            },
-            {
-                "name": "comments",
-                "description": "In body.",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "user",
-                "description": "In body. The person who adds this!",
-                "required": True,
-                "dataType": "string",
+                "dataType": LocMod.__name__,
                 "paramType": "body"
             }
         ],
@@ -271,7 +197,7 @@ class LocationList(Resource):
         self.parser.add_argument('tags', type=str, action='append')
 
     @swagger.operation(
-        responseClass="List of: " + LocDoc.__name__,
+        responseClass=LocMod.__name__,
         nickname="query all locations",
         parameters=[
             {
@@ -415,77 +341,16 @@ class LocationList(Resource):
         return locations.to_json(), 200
 
     @swagger.operation(
-        responseClass=LocDoc.__name__,
+        notes="All these parameters should be in one json object in the body. If there is no data available, just leave"
+              " the field blank but make sure the key is still included.",
+        responseClass=LocMod.__name__,
         nickname="create",
         parameters=[
             {
-                "name": "name",
-                "description": "In body",
+                "name": "location",
+                "description": "Nested json in body. Be sure to read the model about what is required. HqAddr is not!",
                 "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "website",
-                "description": "In body. Must follow http:// full format",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "phone",
-                "description": "In body",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "email",
-                "description": "In body. Must be a valid email address.",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "locationType",
-                "description": "In body",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "coverage",
-                "description": "In body. choices=['International', 'National', 'Regional', 'State', 'Local']",
-                "required": True,
-                "dataType": "list of strings",
-                "paramType": "body"
-            },
-            {
-                "name": "services",
-                "description": "In body.",
-                "required": True,
-                "dataType": "list of strings",
-                "paramType": "body"
-            },
-            {
-                "name": "tags",
-                "description": "In body.",
-                "required": True,
-                "dataType": "list of strings",
-                "paramType": "body"
-            },
-            {
-                "name": "comments",
-                "description": "In body.",
-                "required": True,
-                "dataType": "string",
-                "paramType": "body"
-            },
-            {
-                "name": "user",
-                "description": "In body. The person who adds this!",
-                "required": True,
-                "dataType": "string",
+                "dataType": LocMod.__name__,
                 "paramType": "body"
             }
         ],

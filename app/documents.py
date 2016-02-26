@@ -4,17 +4,30 @@
 
 import json
 from datetime import datetime
-
+from flask_restful_swagger import swagger as sg
 from app import db
+
+
+@sg.model
+class RatingModel:
+    resource_fields = {
+        'value': sg.fields.Integer,
+        'user': sg.fields.String,
+        'comment': sg.fields.String,
+        'ratedOn': sg.fields.DateTime
+    }
+
+    required = ['value', 'user']
 
 
 class Rating(db.EmbeddedDocument):
     """
-        Ratings can get more complex. For now
+        A rating from 1 to 5 with optional comment
     """
-    value = db.IntField(min_value=0, max_value=5)
+    value = db.IntField(min_value=1, max_value=5)
     user = db.StringField(max_length=255)
     comment = db.StringField(required=False)
+    ratedOn = db.DateTimeField(default=datetime.utcnow)
 
     @staticmethod
     def from_data(data, validate=False):
@@ -37,6 +50,22 @@ class Rating(db.EmbeddedDocument):
             rating.validate()
 
         return rating
+
+
+@sg.model
+class AddressModel:
+    resource_fields = {
+        'address1': sg.fields.String,
+        'address2': sg.fields.String,
+        'city': sg.fields.String,
+        'state': sg.fields.String,
+        'country': sg.fields.String,
+        'zipcode': sg.fields.String,
+        'latLng': sg.fields.List(sg.fields.Float),
+    }
+
+    # They're all required
+    required = resource_fields.keys()
 
 
 class Address(db.EmbeddedDocument):
@@ -74,10 +103,37 @@ class Address(db.EmbeddedDocument):
         return address
 
 
+@sg.model
+@sg.nested(address=AddressModel.__name__, hqAddress=AddressModel.__name__, ratings=RatingModel.__name__)
+class LocationModel:
+    resource_fields = {
+        'name': sg.fields.String,
+        'address': sg.fields.Nested(AddressModel.resource_fields),
+        'hqAddress': sg.fields.Nested(AddressModel.resource_fields, default=None, attribute="Not required."),
+        'website': sg.fields.Url,
+        'phone': sg.fields.String,
+        'email': sg.fields.String,
+        'ratings': sg.fields.Nested(RatingModel.resource_fields),
+        'rating': sg.fields.Float(attribute="Only in response."),
+        'locationType': sg.fields.String,
+        'coverage': sg.fields.List(sg.fields.String, attribute=['International', 'National', 'Regional',
+                                                                'State', 'Local', '']),
+        'services': sg.fields.List(sg.fields.String),
+        'tags': sg.fields.List(sg.fields.String),
+        'comments': sg.fields.String,
+        'addedBy': sg.fields.String,
+        'addedOn': sg.fields.DateTime
+    }
+
+    required = ['name', 'address', 'website', 'phone', 'email', 'locationType', 'coverage', 'services', 'tags',
+                'comments', 'addedBy']
+
+
 class Location(db.Document):
     """
         Represents a Veteran Aid Location
     """
+
     name = db.StringField(max_length=255, unique=True)
     address = db.EmbeddedDocumentField(Address)
     hqAddress = db.EmbeddedDocumentField(Address)
@@ -86,7 +142,7 @@ class Location(db.Document):
     email = db.EmailField()
     ratings = db.EmbeddedDocumentListField(Rating, default=[])
     locationType = db.StringField(max_length=255)
-    coverage = db.ListField(db.StringField(choices=['International', 'National', 'Regional', 'State', 'Local']))
+    coverage = db.ListField(db.StringField(choices=['International', 'National', 'Regional', 'State', 'Local', '']))
     # Will probably also want to limit the choices here eventually?
     services = db.ListField(db.StringField(max_length=255))
 
@@ -95,7 +151,7 @@ class Location(db.Document):
     comments = db.StringField()
 
     addedBy = db.StringField()
-    addedDate = db.DateTimeField(default=datetime.utcnow)
+    addedOn = db.DateTimeField(default=datetime.utcnow)
 
     def to_json(self):
         locJson = json.loads(super(Location, self).to_json())
@@ -143,7 +199,7 @@ class Location(db.Document):
             services=data['services'],
             tags=data['tags'],
             comments=data['comments'],
-            addedBy=data['user']
+            addedBy=data['addedBy']
         )
         if validate:
             location.validate()
