@@ -5,7 +5,7 @@ The RESTful API for the Vets 4 Warriors Counselor Resource Project (V4WCRP) writ
 ## Basic guides  
 The Flask Framework is super small. It is contained all in the app/ directory. We should run this inside of a virtualenv
 created from the requirements.txt file.  
-This can be easily setup in Pycharm!  
+There is beautiful documentation (thanks @swagger) available @ the root path when run!  
 
 To install:  
 *pip install -r requirements.txt*  
@@ -14,5 +14,5 @@ To save env:
 
 
 ## Tech stack:  
-Python: 3.4.3  
+Python: 2.7.9
 Mongo: 3.0.9
