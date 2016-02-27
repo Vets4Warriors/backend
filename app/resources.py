@@ -24,7 +24,7 @@ class LocationRating(Resource):
                 "name": "rating",
                 "description": "Rating from 1 to 5.",
                 "required": True,
-                "dataType": "json",
+                "dataType": RateMod.__name__,
                 "paramType": "body"
             }
         ],
@@ -338,7 +338,7 @@ class LocationList(Resource):
                                          address__latLng__max_distance=args['rangeMeters'])
 
         stathat.count('location_get_all', 1)
-        return locations.to_json(), 200
+        return locations.to_json(), 200, {'Access-Control-Allow-Origin': '*'}
 
     @swagger.operation(
         notes="All these parameters should be in one json object in the body. If there is no data available, just leave"
@@ -379,4 +379,4 @@ class LocationList(Resource):
         location.save()
 
         stathat.count('location_post', 1)
-        return location.to_json(), 201
+        return location.to_json(), 201, {'Access-Control-Allow-Origin': '*'}
