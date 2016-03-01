@@ -25,6 +25,9 @@ stathat = StatHat(app)
 basePath = os.environ['VETS_BASE']
 apiVersion = '1'
 
+print basePath
+print apiVersion
+
 # Generates beautiful swagger documents.
 # Available @ /api/spec.html
 api = swagger.docs(Api(app),
