@@ -30,7 +30,7 @@ ext = ''
 if len(exts) != 1:
     ext = exts[len(exts) - 1]
 
-apiSpecUrl = ext + '/spec'
+apiSpecUrl = '/api/spec'
 
 # Generates beautiful swagger documents.
 # Available @ /api/spec.html
