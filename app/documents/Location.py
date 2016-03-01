@@ -1,106 +1,13 @@
-"""
-    Defines the Schemas for each resource in MongoEngine Terms
-"""
+__author__ = 'austin'
 
 import json
 from datetime import datetime
 from flask_restful_swagger import swagger as sg
+
 from app import db
-
-
-@sg.model
-class RatingModel:
-    resource_fields = {
-        'value': sg.fields.Integer,
-        'user': sg.fields.String,
-        'comment': sg.fields.String,
-        'ratedOn': sg.fields.DateTime
-    }
-
-    required = ['value', 'user']
-
-
-class Rating(db.EmbeddedDocument):
-    """
-        A rating from 1 to 5 with optional comment
-    """
-    value = db.IntField(min_value=1, max_value=5)
-    user = db.StringField(max_length=255)
-    comment = db.StringField(required=False)
-    ratedOn = db.DateTimeField(default=datetime.utcnow)
-
-    @staticmethod
-    def from_data(data, validate=False):
-        """
-
-        :param data:
-        :return: Rating
-        """
-        comment = None
-        if 'comment' in data:
-            comment = data['comment']
-
-        rating = Rating(
-            value=data['value'],
-            user=data['user'],
-            comment=comment
-        )
-
-        if validate:
-            rating.validate()
-
-        return rating
-
-
-@sg.model
-class AddressModel:
-    resource_fields = {
-        'address1': sg.fields.String,
-        'address2': sg.fields.String,
-        'city': sg.fields.String,
-        'state': sg.fields.String,
-        'country': sg.fields.String,
-        'zipcode': sg.fields.String,
-        'latLng': sg.fields.List(sg.fields.Float),
-    }
-
-    # They're all required
-    required = resource_fields.keys()
-
-
-class Address(db.EmbeddedDocument):
-    """
-        A basic address representation
-    """
-    address1 = db.StringField(max_length=255)
-    address2 = db.StringField(max_length=255)
-    city = db.StringField(max_length=255)
-    state = db.StringField(max_length=255)
-    country = db.StringField(max_length=255)
-    zipcode = db.StringField(max_length=10)
-    latLng = db.PointField()
-
-    @staticmethod
-    def from_data(data, validate=False):
-        """
-        :raises: TypeError
-        :raises: KeyError
-        :param data:
-        :return: Address
-        """
-        address = Address(
-                address1=data['address1'],
-                address2=data['address2'],
-                city=data['city'],
-                state=data['state'],
-                country=data['country'],
-                zipcode=data['zipcode'],
-                latLng=data['latLng']
-        )
-        if validate:
-            address.validate()
-
-        return address
+from app.documents.Address import Address, AddressModel
+from app.documents.Rating import Rating, RatingModel
+from app.querySets import Location as LocQuery
 
 
 @sg.model
@@ -133,6 +40,10 @@ class Location(db.Document):
     """
         Represents a Veteran Aid Location
     """
+
+    # meta = {
+    #     'queryset_class': LocQuery
+    # }
 
     name = db.StringField(max_length=255, unique=True)
     address = db.EmbeddedDocumentField(Address)
@@ -205,4 +116,3 @@ class Location(db.Document):
             location.validate()
 
         return location
-

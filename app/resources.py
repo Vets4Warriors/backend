@@ -6,8 +6,9 @@ from flask_restful import Resource, reqparse
 from flask_restful_swagger import swagger
 
 from app import stathat
-from app.documents import Location as LocDoc, Rating as RateDoc, Address as AddrDoc
-from app.documents import LocationModel as LocMod, RatingModel as RateMod, AddressModel as AddrMod
+from app.documents.Location import Location as LocDoc, LocationModel as LocMod
+from app.documents.Rating import Rating as RateDoc, RatingModel as RateMod
+# from app.documents.Address import Address as AddrDoc, AddressModel as AddrMod
 
 
 class LocationRating(Resource):
@@ -55,7 +56,7 @@ class LocationRating(Resource):
         location.save()
         location.reload()
         # Don't really need to send it back but whatevs
-        return location.to_json(), 201
+        return location.to_json(), 201, {'Access-Control-Allow-Origin': '*'}
 
 
 class Location(Resource):
@@ -82,7 +83,7 @@ class Location(Resource):
         """
         location = LocDoc.objects.get(id=locId)
         stathat.count('location_get ' + str(location.id), 1)
-        return location.to_json(), 200
+        return location.to_json(), 200, {'Access-Control-Allow-Origin': '*'}
 
     @swagger.operation(
         notes="All these parameters should be in one json object in the body. If there is no data available, just leave"
@@ -142,7 +143,7 @@ class Location(Resource):
         # Will eventually do update logs/diffs
 
         stathat.count('location_put: ' + str(location.id), 1)
-        return location.to_json(), 201
+        return location.to_json(), 201, {'Access-Control-Allow-Origin': '*'}
 
     @swagger.operation(
         notes="Delete a location",

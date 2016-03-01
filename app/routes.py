@@ -2,19 +2,19 @@
     Basic routes for our app, including status, index, resources, and error handlers
 """
 from flask import jsonify, make_response, redirect
-from app import app, stathat, api
+from app import app, stathat, api, basePath, apiVersion
 from app.resources import Location, LocationList, LocationRating
 from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError
 
 
-@app.route('/')
+@app.route(basePath)
 def index():
     stathat.count('index', 1)
-    return redirect('/api/spec.html')
+    return redirect(basePath + '/api/spec.html')
 
-api.add_resource(LocationList, '/locations')
-api.add_resource(Location, '/locations/<string:locId>')
-api.add_resource(LocationRating, '/locations/rate/<string:locId>')
+api.add_resource(LocationList, basePath + apiVersion + '/locations')
+api.add_resource(Location, basePath + apiVersion + '/locations/<string:locId>')
+api.add_resource(LocationRating, basePath + apiVersion + '/locations/<string:locId>/rate')
 
 
 @app.errorhandler(NotUniqueError)
