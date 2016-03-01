@@ -24,7 +24,7 @@ stathat = StatHat(app)
 
 apiVersion = '1.0'
 apiServer = os.environ['VETS_SERVER']
-apiSpecUrl = '/spec.html'
+apiSpecUrl = '/spec'
 
 # Generates beautiful swagger documents.
 # Available @ /api/spec.html
