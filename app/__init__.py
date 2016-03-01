@@ -23,13 +23,15 @@ db = MongoEngine(app)
 stathat = StatHat(app)
 
 apiVersion = '1.0'
-
+apiSpecUrl = '/spec.html'
+apiBase = os.environ['VETS_BASE']
 
 # Generates beautiful swagger documents.
 # Available @ /api/spec.html
 api = swagger.docs(Api(app),
                    description="The API for the Vets4Warriors online interface!",
-                   basePath='http://localhost:8000',
+                   basePath='http://localhost' + apiBase,
+                   api_spec_url=apiSpecUrl,
                    apiVersion=apiVersion)
 
 # Loads our routes
