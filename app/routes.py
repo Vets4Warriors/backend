@@ -2,7 +2,7 @@
     Basic routes for our app, including status, index, resources, and error handlers
 """
 from flask import jsonify, make_response, redirect
-from app import app, stathat, api, apiVersion, apiSpecUrl
+from app import app, stathat, api, apiVersion, apiSpecUrl, apiServer
 from app.resources import Location, LocationList, LocationRating
 from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError
 
@@ -10,11 +10,11 @@ from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError
 @app.route('/')
 def index():
     stathat.count('index', 1)
-    return redirect(apiSpecUrl)
+    return redirect('http://' + apiServer + apiSpecUrl + '.html')
 
-api.add_resource(LocationList, '/' + apiVersion + '/locations')
-api.add_resource(Location, '/' + apiVersion + '/locations/<string:locId>')
-api.add_resource(LocationRating, '/' + apiVersion + '/locations/<string:locId>/rate')
+api.add_resource(LocationList, '/api/' + apiVersion + '/locations')
+api.add_resource(Location, '/api/' + apiVersion + '/locations/<string:locId>')
+api.add_resource(LocationRating, '/api/' + apiVersion + '/locations/<string:locId>/rate')
 
 
 @app.errorhandler(NotUniqueError)
