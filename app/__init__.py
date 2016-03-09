@@ -5,6 +5,7 @@
 import os
 from flask import Flask
 from flask_restful import Api
+from flask_restful.utils import cors
 from flask_restful_swagger import swagger
 from flask_mongoengine import MongoEngine
 from flask_stathat import StatHat
@@ -34,6 +35,8 @@ api = swagger.docs(Api(app),
                    basePath='http://' + apiServer,
                    api_spec_url=apiSpecUrl,
                    apiVersion=apiVersion)
+
+api.decorators = [cors.crossdomain(origin='*', headers=['Content-Type'])]
 
 # Loads our routes
 from app import routes

@@ -4,7 +4,7 @@
 from flask import jsonify, make_response, redirect
 from app import app, stathat, api, apiVersion, apiSpecUrl, apiServer
 from app.resources import Location, LocationList, LocationRating
-from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError
+from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError, OperationError
 
 
 @app.route('/')
@@ -17,13 +17,16 @@ api.add_resource(Location, '/api/' + apiVersion + '/locations/<string:locId>')
 api.add_resource(LocationRating, '/api/' + apiVersion + '/locations/<string:locId>/rate')
 
 
+@app.errorhandler(OperationError)
 @app.errorhandler(NotUniqueError)
 @app.errorhandler(ValidationError)
 def mongo_error(error):
     app.logger.error(error.message)
     if app.debug:
-        return make_response(jsonify(error=error.message), 400)
-    return bad_req(error)
+        resp = make_response(jsonify(error=error.message), 400)
+    else:
+        resp = bad_req(error)
+    return resp
 
 
 @app.errorhandler(400)

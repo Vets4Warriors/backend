@@ -58,6 +58,10 @@ class LocationRating(Resource):
         # Don't really need to send it back but whatevs
         return location.to_json(), 201, {'Access-Control-Allow-Origin': '*'}
 
+    def options(self, locId):
+        print 'OPTIONS'
+        pass
+
 
 class Location(Resource):
     """
@@ -381,3 +385,7 @@ class LocationList(Resource):
 
         stathat.count('location_post', 1)
         return location.to_json(), 201, {'Access-Control-Allow-Origin': '*'}
+
+    def options(self, locId):
+        print 'OPTIONS'
+        pass
