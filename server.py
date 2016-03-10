@@ -4,9 +4,7 @@
 """
 __author__ = 'austin'
 
-from app import app as api
-from app import configure_app
-
+import os
 import argparse
 from tornado.wsgi import WSGIContainer
 from tornado.ioloop import IOLoop
@@ -23,11 +21,10 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--env', help="Either 'dev' or 'prod' ", required=True)
     args = parser.parse_args()
 
-    try:
-        configure_app(args.env)
-    except AttributeError:
-        configure_app('prod')
+    os.environ['VETS_ENV'] = args.env
 
+    # Now load the app
+    from app import app as api
     flask = WSGIContainer(api)
     application = Application(
         [

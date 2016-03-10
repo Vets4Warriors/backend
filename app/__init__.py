@@ -14,7 +14,12 @@ from config import ProductionConfig, DevelopmentConfig
 
 app = Flask(__name__)
 
-app.config.from_object(DevelopmentConfig)
+if os.environ['VETS_ENV'] == 'dev':
+    app.config.from_object(DevelopmentConfig)
+else:
+    app.config.from_object(ProductionConfig)
+
+
 
 db = MongoEngine(app)
 stathat = StatHat(app)
@@ -35,13 +40,6 @@ api.decorators = [cors.crossdomain(origin='*', headers=['Content-Type'])]
 
 # Loads our routes
 from app import routes
-
-
-def configure_app(env):
-    if env == 'dev':
-        app.config.from_object(DevelopmentConfig)
-    else:
-        app.config.from_object(ProductionConfig)
 
 
 if __name__ == '__main__':
