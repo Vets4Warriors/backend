@@ -26,6 +26,8 @@ class AddressModel:
 class Address(db.EmbeddedDocument):
     """
         A basic address representation
+
+        KEY POINT: latLng is stored ad [lng, lat] in mongodb
     """
     address1 = db.StringField(max_length=255)
     address2 = db.StringField(max_length=255)
@@ -43,6 +45,11 @@ class Address(db.EmbeddedDocument):
         :param data:
         :return: Address
         """
+        # Check for a dict of {lat: , lng: } form and convert
+        latLng = data['latLng']
+        if type(data['latLng']) is dict:
+            latLng = [latLng['lng'], latLng['lat']]
+
         address = Address(
                 address1=data['address1'],
                 address2=data['address2'],
@@ -50,7 +57,7 @@ class Address(db.EmbeddedDocument):
                 state=data['state'],
                 country=data['country'],
                 zipcode=data['zipcode'],
-                latLng=data['latLng']
+                latLng=latLng
         )
         if validate:
             address.validate()

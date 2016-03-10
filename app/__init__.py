@@ -10,14 +10,19 @@ from flask_restful_swagger import swagger
 from flask_mongoengine import MongoEngine
 from flask_stathat import StatHat
 
-from config import ProductionConfig, DevelopmentConfig
+import config
 
 app = Flask(__name__)
 
-if os.environ['VETS_ENV'] == 'dev':
-    app.config.from_object(DevelopmentConfig)
+# Default to production mode
+env = os.environ.get('VETS_ENV', 'prod')
+
+if env == 'local':
+    app.config.from_object(config.LocalConfig)
+elif env == 'dev':
+    app.config.from_object(config.DevelopmentConfig)
 else:
-    app.config.from_object(ProductionConfig)
+    app.config.from_object(config.ProductionConfig)
 
 
 

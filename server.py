@@ -18,7 +18,7 @@ class MainHandler(RequestHandler):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='The vets 4 warriors frontend runner')
-    parser.add_argument('-e', '--env', help="Either 'dev' or 'prod' ", required=True)
+    parser.add_argument('-e', '--env', help="Either 'local', 'dev' or 'prod'. Default is 'prod'", required=True)
     args = parser.parse_args()
 
     os.environ['VETS_ENV'] = args.env

@@ -49,7 +49,7 @@ class Location(db.Document):
     address = db.EmbeddedDocumentField(Address)
     hqAddress = db.EmbeddedDocumentField(Address)
     website = db.URLField()
-    phone = db.StringField(max_length=11)
+    phone = db.StringField(max_length=15)
     email = db.EmailField()
     ratings = db.EmbeddedDocumentListField(Rating, default=[])
     locationType = db.StringField(max_length=255)
@@ -67,6 +67,7 @@ class Location(db.Document):
     def to_json(self):
         locJson = json.loads(super(Location, self).to_json())
         locJson['rating'] = self.get_rating()
+        # Should we return a formatted address here on our end so clients don't have to deal?
         return json.dumps(locJson)
 
     def get_rating(self):
@@ -95,8 +96,15 @@ class Location(db.Document):
 
         # Not required
         hqAddress = None
-        if 'hqAddress' in data:
+        if 'hqAddress' in data and data['hqAddress'] is not None:
             hqAddress = Address.from_data(data['hqAddress'], validate=validate)
+
+        # Process all the tags to be lowercase but services to be capitalized
+        for i in range(0, len(data['tags'])):
+            data['tags'][i] = data['tags'][i].lower()
+
+        for i in range(0, len(data['services'])):
+            data['services'][i] = data['services'][i].capitalize()
 
         location = Location(
             name=data['name'],
@@ -106,7 +114,7 @@ class Location(db.Document):
             phone=data['phone'],
             email=data['email'],
             locationType=data['locationType'],
-            coverage=data['coverage'],
+            coverage=data['coverages'],
             services=data['services'],
             tags=data['tags'],
             comments=data['comments'],

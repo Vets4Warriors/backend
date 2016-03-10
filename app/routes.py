@@ -26,6 +26,9 @@ def mongo_error(error):
         resp = make_response(jsonify(error=error.message), 400)
     else:
         resp = bad_req(error)
+
+    # Should put on all outgoing
+    resp.headers['Access-Control-Allow-Origin'] = '*'
     return resp
 
 

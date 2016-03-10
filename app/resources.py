@@ -331,15 +331,16 @@ class LocationList(Resource):
                 elif key == 'locationType':
                     locations = locations.filter(locationType__icontains=args[key])
                 elif key == 'coverage':
-                    locations = locations.filter(coverage__in=args[key])
+                    locations = locations.filter(coverage__in=args[key].capitalize())
                 elif key == 'services':
-                    locations = locations.filter(services__in=args[key])
+                    locations = locations.filter(services__in=args[key].capitalize()())
                 elif key == 'tags':
-                    locations = locations.filter(tags__in=args[key])
+                    locations = locations.filter(tags__in=args[key].lower())
 
         # Do a range search if there
         if args['rangeMeters'] != 0:
-            locations = locations.filter(address__latLng__near=[args['lat'], args['lng']],
+            # In lng / lat coordinates
+            locations = locations.filter(address__latLng__near=[args['lng'], args['lat']],
                                          address__latLng__max_distance=args['rangeMeters'])
 
         stathat.count('location_get_all', 1)
@@ -379,8 +380,6 @@ class LocationList(Resource):
         except (TypeError, KeyError) as ex:
             abort(400)
 
-        location.get_rating()
-        location.to_json()
         location.save()
 
         stathat.count('location_post', 1)

@@ -15,5 +15,11 @@ class ProductionConfig(Config):
     SERVER = 'vets.cawleyedwards.com/api'
 
 
+class LocalConfig(Config):
+    DEBUG = True
+    SERVER = 'localhost:8000'
+
+
 class DevelopmentConfig(Config):
     DEBUG = True
+    SERVER = 'localhost'
