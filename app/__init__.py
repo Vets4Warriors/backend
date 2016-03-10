@@ -10,29 +10,24 @@ from flask_restful_swagger import swagger
 from flask_mongoengine import MongoEngine
 from flask_stathat import StatHat
 
+from config import ProductionConfig, DevelopmentConfig
+
 app = Flask(__name__)
 
-app.debug = os.environ['VETS_ENV'] == 'DEV'
-app.config['MONGODB_SETTINGS'] = {
-    'host': 'localhost',
-    'port': 27017,
-    'db': 'vets'
-}
-app.config['STATHAT_EZ_KEY'] = 'o3OaE05mySW3g9RH'
+app.config.from_object(DevelopmentConfig)
 
 db = MongoEngine(app)
 stathat = StatHat(app)
 
 apiVersion = '1.0'
-apiServer = os.environ['VETS_SERVER']
-
+apiServerName = app.config['SERVER']
 apiSpecUrl = '/spec'
 
 # Generates beautiful swagger documents.
 # Available @ /api/spec.html
 api = swagger.docs(Api(app),
                    description="The API for the Vets4Warriors online interface!",
-                   basePath='http://' + apiServer,
+                   basePath='http://' + apiServerName,
                    api_spec_url=apiSpecUrl,
                    apiVersion=apiVersion)
 
@@ -40,6 +35,14 @@ api.decorators = [cors.crossdomain(origin='*', headers=['Content-Type'])]
 
 # Loads our routes
 from app import routes
+
+
+def configure_app(env):
+    if env == 'dev':
+        app.config.from_object(DevelopmentConfig)
+    else:
+        app.config.from_object(ProductionConfig)
+
 
 if __name__ == '__main__':
     app.run(port=5000)
