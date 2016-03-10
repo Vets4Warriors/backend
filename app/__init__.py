@@ -14,7 +14,8 @@ from config import ProductionConfig, DevelopmentConfig
 
 app = Flask(__name__)
 
-if os.environ['VETS_ENV'] == 'dev':
+# Default to production mode
+if os.environ.get('VETS_ENV', 'prod') == 'dev':
     app.config.from_object(DevelopmentConfig)
 else:
     app.config.from_object(ProductionConfig)
