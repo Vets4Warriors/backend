@@ -11,7 +11,6 @@ from flask_mongoengine import MongoEngine
 from flask_stathat import StatHat
 
 import config
-
 app = Flask(__name__)
 
 # Default to production mode

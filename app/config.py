@@ -13,6 +13,7 @@ class Config:
 
 class ProductionConfig(Config):
     SERVER = 'vets.cawleyedwards.com/api'
+    SERVER_NAME = 'vets.cawleyedwards.com/api'
 
 
 class LocalConfig(Config):
