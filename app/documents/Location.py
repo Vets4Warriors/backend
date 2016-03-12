@@ -23,7 +23,7 @@ class LocationModel:
         'ratings': sg.fields.Nested(RatingModel.resource_fields),
         'rating': sg.fields.Float(attribute="Only in response."),
         'locationType': sg.fields.String,
-        'coverage': sg.fields.List(sg.fields.String, attribute=['International', 'National', 'Regional',
+        'coverages': sg.fields.List(sg.fields.String, attribute=['International', 'National', 'Regional',
                                                                 'State', 'Local', '']),
         'services': sg.fields.List(sg.fields.String),
         'tags': sg.fields.List(sg.fields.String),
@@ -32,7 +32,7 @@ class LocationModel:
         'addedOn': sg.fields.DateTime
     }
 
-    required = ['name', 'address', 'website', 'phone', 'email', 'locationType', 'coverage', 'services', 'tags',
+    required = ['name', 'address', 'website', 'phone', 'email', 'locationType', 'coverages', 'services', 'tags',
                 'comments', 'addedBy']
 
 
@@ -53,7 +53,7 @@ class Location(db.Document):
     email = db.EmailField()
     ratings = db.EmbeddedDocumentListField(Rating, default=[])
     locationType = db.StringField(max_length=255)
-    coverage = db.ListField(db.StringField(choices=['International', 'National', 'Regional', 'State', 'Local', '']))
+    coverages = db.ListField(db.StringField(choices=['International', 'National', 'Regional', 'State', 'Local', '']))
     # Will probably also want to limit the choices here eventually?
     services = db.ListField(db.StringField(max_length=255))
 
@@ -114,7 +114,7 @@ class Location(db.Document):
             phone=data['phone'],
             email=data['email'],
             locationType=data['locationType'],
-            coverage=data['coverages'],
+            coverages=data['coverages'],
             services=data['services'],
             tags=data['tags'],
             comments=data['comments'],

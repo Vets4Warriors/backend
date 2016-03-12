@@ -330,7 +330,7 @@ class LocationList(Resource):
                     locations = locations.filter(email__icontains=args[key])
                 elif key == 'locationType':
                     locations = locations.filter(locationType__icontains=args[key])
-                elif key == 'coverage':
+                elif key == 'coverages':
                     locations = locations.filter(coverage__in=args[key].capitalize())
                 elif key == 'services':
                     locations = locations.filter(services__in=args[key].capitalize()())
