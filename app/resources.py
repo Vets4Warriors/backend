@@ -331,11 +331,14 @@ class LocationList(Resource):
                 elif key == 'locationType':
                     locations = locations.filter(locationType__icontains=args[key])
                 elif key == 'coverages':
-                    locations = locations.filter(coverage__in=args[key].capitalize())
+                    for coverage in args[key]:
+                        locations = locations.filter(coverage__in=coverage.capitalize())
                 elif key == 'services':
-                    locations = locations.filter(services__in=args[key].capitalize()())
+                    for service in args[key]:
+                        locations = locations.filter(services__in=service.capitalize()())
                 elif key == 'tags':
-                    locations = locations.filter(tags__in=args[key].lower())
+                    for tag in args[key]:
+                        locations = locations.filter(tags__in=tag.lower())
 
         # Do a range search if there
         if args['rangeMeters'] != 0:

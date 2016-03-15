@@ -35,5 +35,7 @@ if __name__ == "__main__":
         ]
     )
 
+    print "Server running on port 8000 in " + args.env + " mode"
+
     application.listen(8000)
     IOLoop.instance().start()
