@@ -1,6 +1,7 @@
 
 
 from datetime import datetime
+from flask import abort
 from flask_restful_swagger import swagger as sg
 from app import db
 
@@ -39,6 +40,11 @@ class Rating(db.EmbeddedDocument):
         comment = None
         if 'comment' in data:
             comment = data['comment']
+
+        if 'value' not in data or not isinstance(data['value'], int):
+            abort(400)
+        if 'user' not in data or not isinstance(data['user'], unicode):
+            abort(400)
 
         rating = Rating(
             value=data['value'],
