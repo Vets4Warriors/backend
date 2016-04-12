@@ -24,7 +24,6 @@ else:
     app.config.from_object(config.ProductionConfig)
 
 
-
 db = MongoEngine(app)
 stathat = StatHat(app)
 
@@ -47,4 +46,4 @@ from app import routes
 
 
 if __name__ == '__main__':
-    app.run(port=5000)
+    api.run(port=5000)

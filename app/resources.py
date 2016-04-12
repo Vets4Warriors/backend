@@ -131,6 +131,8 @@ class Location(Resource):
         except (TypeError, KeyError) as ex:
             abort(400)
 
+        # We should just check if a field is there and overlap it
+        # Todo!
         location.update(
             name=updatedLocation.name,
             address=updatedLocation.address,

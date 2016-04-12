@@ -23,7 +23,7 @@ api.add_resource(LocationRating, '/' + apiVersion + '/locations/<string:locId>/r
 def mongo_error(error):
     app.logger.error(error.message)
     if app.debug:
-        resp = make_response(jsonify(error=error.message), 400)
+        resp = make_response(jsonify(error=str(error)), 400)
     else:
         resp = bad_req(error)
 
