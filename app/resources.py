@@ -142,7 +142,7 @@ class Location(Resource):
         if 'locationType' in data and isinstance(data['locationType'], unicode):
             location.update(locationType=data['locationType'])
         if 'coverages' in data and isinstance(data['coverages'], list):
-            location.update(coverage=data['coverages'])
+            location.update(coverages=data['coverages'])
         if 'services' in data and isinstance(data['services'], list):
             location.update(services=data['services'])
         if 'tags' in data and isinstance(data['tags'], list):
