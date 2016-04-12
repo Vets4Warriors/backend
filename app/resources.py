@@ -8,7 +8,7 @@ from flask_restful_swagger import swagger
 from app import stathat
 from app.documents.Location import Location as LocDoc, LocationModel as LocMod
 from app.documents.Rating import Rating as RateDoc, RatingModel as RateMod
-# from app.documents.Address import Address as AddrDoc, AddressModel as AddrMod
+from app.documents.Address import Address as AddrDoc, AddressModel as AddrMod
 
 
 class LocationRating(Resource):
@@ -124,28 +124,32 @@ class Location(Resource):
         """
         # First find the Location
         location = LocDoc.objects.get(id=locId)
-        # In order to update by specific key, would have to do a lot of conditionals
-        # So just don't. Or do later.
-        try:
-            updatedLocation = LocDoc.from_data(request.get_json(), validate=True)
-        except (TypeError, KeyError) as ex:
-            abort(400)
 
-        # We should just check if a field is there and overlap it
-        # Todo!
-        location.update(
-            name=updatedLocation.name,
-            address=updatedLocation.address,
-            hqAddress=updatedLocation.hqAddress,
-            website=updatedLocation.website,
-            phone=updatedLocation.phone,
-            email=updatedLocation.email,
-            locationType=updatedLocation.locationType,
-            coverage=updatedLocation.coverage,
-            services=updatedLocation.services,
-            tags=updatedLocation.tags,
-            comments=updatedLocation.comments
-        )
+        data = request.get_json()
+
+        if 'name' in data and isinstance(data['name'], unicode):
+            location.update(name=data['name'])
+        if 'address' in data:
+            newAddr = AddrDoc.from_data(data=data['address'])
+            location.update(address=newAddr)
+        if 'hqAddress' in data:
+            newHqAddr = AddrDoc.from_data(data=data['hqAddress'])
+            location.update(address=newHqAddr)
+        if 'website' in data and isinstance(data['website'], unicode):
+            location.update(website=data['website'])
+        if 'phone' in data and isinstance(data['phone'], unicode):
+            location.update(phone=data['phone'])
+        if 'locationType' in data and isinstance(data['locationType'], unicode):
+            location.update(locationType=data['locationType'])
+        if 'coverages' in data and isinstance(data['coverages'], list):
+            location.update(coverage=data['coverages'])
+        if 'services' in data and isinstance(data['services'], list):
+            location.update(services=data['services'])
+        if 'tags' in data and isinstance(data['tags'], list):
+            location.update(tags=data['tags'])
+        if 'comments' in data and isinstance(data['comments'], unicode):
+            location.update(comments=data['comments'])
+
         # Will eventually do update logs/diffs
 
         stathat.count('location_put: ' + str(location.id), 1)
@@ -177,6 +181,9 @@ class Location(Resource):
         location.delete()
         stathat.count('location_delete ' + str(location.id), 1)
         return '', 204  # No Content Return
+
+    def options(self, locId):
+        pass
 
 
 class LocationList(Resource):
@@ -391,5 +398,4 @@ class LocationList(Resource):
         return location.to_json(), 201, {'Access-Control-Allow-Origin': '*'}
 
     def options(self, locId):
-        print 'OPTIONS'
         pass
