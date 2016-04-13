@@ -35,6 +35,7 @@ class Rating(db.EmbeddedDocument):
         """
 
         :param data:
+        :param validate:
         :return: Rating
         """
         comment = None
