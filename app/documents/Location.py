@@ -2,6 +2,7 @@ __author__ = 'austin'
 
 import json
 from datetime import datetime
+from flask import abort
 from flask_restful_swagger import swagger as sg
 
 from app import db
@@ -94,15 +95,15 @@ class Location(db.Document):
         # Will see if the users mess it up enough / harder on the front end
 
         phone = None
-        if 'phone' in data and type(data['phone']) is str:
+        if 'phone' in data and isinstance(data['phone'], unicode):
             phone = data['phone']
 
         email = None
-        if 'email' in data and type(data['email']) is str:
+        if 'email' in data and isinstance(data['email'], unicode):
             email = data['email']
 
         comments = None
-        if 'comments' in data and type(data['comments']) is str:
+        if 'comments' in data and isinstance(data['comments'], unicode):
             comments = data['comments']
 
         address = None
@@ -115,12 +116,23 @@ class Location(db.Document):
 
         # Process all the tags to be lowercase but services to be capitalized
         tags = None
-        if 'tags' in data and type(data['tags']) is list:
+        if 'tags' in data and isinstance(data['tags'], list):
+            tags = []
             for i in range(0, len(data['tags'])):
-                data['tags'][i] = data['tags'][i].lower()
+                if isinstance(data['tags'][i], unicode):
+                    tags.append(data['tags'][i].strip().lower())
 
+        # Required
+        if 'locationType' not in data or not isinstance(data['locationType'], unicode):
+            abort(400)
+
+        if 'services' not in data or not isinstance(data['services'], list):
+            abort(400)
+
+        services = []
         for i in range(0, len(data['services'])):
-            data['services'][i] = data['services'][i].capitalize()
+            if isinstance(data['services'][i], unicode):
+                services.append(data['services'][i].strip().capitalize())
 
         location = Location(
             name=data['name'],
@@ -131,7 +143,7 @@ class Location(db.Document):
             email=email,
             locationType=data['locationType'],
             coverages=data['coverages'],
-            services=data['services'],
+            services=services,
             tags=tags,
             comments=comments,
             addedBy=data['addedBy']

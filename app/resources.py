@@ -8,6 +8,7 @@ from flask_restful_swagger import swagger
 from app import stathat
 from app.documents.Location import Location as LocDoc, LocationModel as LocMod
 from app.documents.Rating import Rating as RateDoc, RatingModel as RateMod
+from app.documents.Rating import Rating as RateDoc, RatingModel as RateMod
 from app.documents.Address import Address as AddrDoc, AddressModel as AddrMod
 
 
