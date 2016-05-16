@@ -135,7 +135,7 @@ class Location(Resource):
             location.update(address=newAddr)
         if 'hqAddress' in data:
             newHqAddr = AddrDoc.from_data(data=data['hqAddress'])
-            location.update(address=newHqAddr)
+            location.update(hqAddress=newHqAddr)
         if 'website' in data and isinstance(data['website'], unicode):
             location.update(website=data['website'])
         if 'phone' in data and isinstance(data['phone'], unicode):
