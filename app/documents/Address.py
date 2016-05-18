@@ -40,23 +40,40 @@ class Address(db.EmbeddedDocument):
     @staticmethod
     def from_data(data, validate=False):
         """
+        Allows for None address1, address2, and zip.
+        Will need to account for this in the frontend.
+
         :raises: TypeError
         :raises: KeyError
         :param data:
         :return: Address
         """
+
+        # Required
         # Check for a dict of {lat: , lng: } form and convert
         latLng = data['latLng']
         if type(data['latLng']) is dict:
             latLng = [latLng['lng'], latLng['lat']]
 
+        zipcode = None
+        if 'zipcode' in data:
+            zipcode = data['zipcode']
+
+        address1 = None
+        if 'address1' in data:
+            address1 = data['address1']
+
+        address2 = None
+        if 'address2' in data:
+            address2 = data['address2']
+
         address = Address(
-                address1=data['address1'],
+                address1=address1,
                 address2=data['address2'],
                 city=data['city'],
                 state=data['state'],
                 country=data['country'],
-                zipcode=data['zipcode'],
+                zipcode=zipcode,
                 latLng=latLng
         )
         if validate:
