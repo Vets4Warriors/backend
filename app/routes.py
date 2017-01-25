@@ -10,7 +10,7 @@ from mongoengine.errors import NotUniqueError, DoesNotExist, ValidationError, Op
 @app.route('/')
 def index():
     stathat.count('index', 1)
-    return redirect('http://' + apiServerName + apiSpecUrl + '.html')
+    return redirect(apiServerName + apiSpecUrl + '.html')
 
 api.add_resource(LocationList, '/' + apiVersion + '/locations')
 api.add_resource(Location, '/' + apiVersion + '/locations/<string:locId>')

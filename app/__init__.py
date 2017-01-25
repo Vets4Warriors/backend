@@ -35,7 +35,7 @@ apiSpecUrl = '/spec'
 # Available @ /api/spec.html
 api = swagger.docs(Api(app),
                    description="The API for the Vets4Warriors online interface!",
-                   basePath='http://' + apiServerName,
+                   basePath=apiServerName,
                    api_spec_url=apiSpecUrl,
                    apiVersion=apiVersion)
 

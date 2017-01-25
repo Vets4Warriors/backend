@@ -48,15 +48,15 @@ class Location(db.Document):
     name = db.StringField(max_length=255, unique=True, required=True)
     address = db.EmbeddedDocumentField(Address)
     hqAddress = db.EmbeddedDocumentField(Address)
-    website = db.URLField(required=True)
+    website = db.URLField(default=None)
     phone = db.StringField(max_length=15)
-    email = db.EmailField()
+    email = db.EmailField(default=None)
     ratings = db.EmbeddedDocumentListField(Rating, default=[])
     locationType = db.StringField(max_length=255, required=True)
     coverages = db.ListField(db.StringField(choices=['International', 'National', 'Regional', 'State', 'Local', ''],
-                                            required=True))
+                                            default=[]))
     # Will probably also want to limit the choices here eventually?
-    services = db.ListField(db.StringField(max_length=255, required=True))
+    services = db.ListField(db.StringField(max_length=255), default=[])
 
     tags = db.ListField(db.StringField(max_length=255), default=[])
     # Eventually we can make this a threaded list like a forum
@@ -88,23 +88,32 @@ class Location(db.Document):
     def from_data(data, validate=False):
         """
             Builds a LocDoc from a json dictionary
-        :param jsonData: dict
+        :param data: dict
+        :param validate: bool
         :return: app.documents.Location
         """
         # Could get more intense about validation/formatting data
         # Will see if the users mess it up enough / harder on the front end
 
         phone = None
-        if 'phone' in data and isinstance(data['phone'], unicode):
+        if 'phone' in data and isinstance(data['phone'], unicode) and data['phone'] != '':
             phone = data['phone']
 
         email = None
-        if 'email' in data and isinstance(data['email'], unicode):
+        if 'email' in data and isinstance(data['email'], unicode) and data['email'] != '':
             email = data['email']
+
+        website = None
+        if 'website' in data and isinstance(data['website'], unicode) and data['website'] != '':
+            website = data['website']
 
         comments = None
         if 'comments' in data and isinstance(data['comments'], unicode):
             comments = data['comments']
+
+        locationType = None
+        if 'locationType' in data and isinstance(data['locationType'], unicode):
+            locationType = data['locationType']
 
         address = None
         if 'address' in data and data['address'] is not None:
@@ -115,33 +124,33 @@ class Location(db.Document):
             hqAddress = Address.from_data(data['hqAddress'], validate=validate)
 
         # Process all the tags to be lowercase but services to be capitalized
-        tags = None
+        tags = []
         if 'tags' in data and isinstance(data['tags'], list):
-            tags = []
             for i in range(0, len(data['tags'])):
                 if isinstance(data['tags'][i], unicode):
                     tags.append(data['tags'][i].strip().lower())
 
-        # Required
-        if 'locationType' not in data or not isinstance(data['locationType'], unicode):
-            abort(400)
-
-        if 'services' not in data or not isinstance(data['services'], list):
-            abort(400)
-
         services = []
-        for i in range(0, len(data['services'])):
-            if isinstance(data['services'][i], unicode):
-                services.append(data['services'][i].strip().capitalize())
+        if 'services' in data and isinstance(data['services'], list):
+            for i in range(0, len(data['services'])):
+                if isinstance(data['services'][i], unicode):
+                    services.append(data['services'][i].strip().capitalize())
+
+        # Required
+        if 'name' not in data or not isinstance(data['name'], unicode):
+            abort(400)
+
+        if 'addedBy' not in data or not isinstance(data['addedBy'], unicode):
+            abort(400)
 
         location = Location(
             name=data['name'],
             address=address,
             hqAddress=hqAddress,
-            website=data['website'],
+            website=website,
             phone=phone,
             email=email,
-            locationType=data['locationType'],
+            locationType=locationType,
             coverages=data['coverages'],
             services=services,
             tags=tags,

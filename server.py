@@ -19,9 +19,12 @@ class MainHandler(RequestHandler):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='The vets 4 warriors frontend runner')
     parser.add_argument('-e', '--env', help="Either 'local', 'dev' or 'prod'. Default is 'prod'", required=True)
+    parser.add_argument('-p', '--port', help="Specify the port to run on. Default is 5000", required=False, default=5000)
+
     args = parser.parse_args()
 
     os.environ['VETS_ENV'] = args.env
+    os.environ['VETS_PORT'] = str(args.port)
 
     # Now load the app
     from app import app as api
@@ -35,7 +38,7 @@ if __name__ == "__main__":
         ]
     )
 
-    print "Server running on port 8000 in " + args.env + " mode"
+    print "Server running on port " + str(args.port) + "  in " + args.env + " mode"
 
-    application.listen(8000)
+    application.listen(args.port)
     IOLoop.instance().start()

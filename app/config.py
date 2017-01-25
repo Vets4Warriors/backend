@@ -1,3 +1,5 @@
+import os
+
 class Config:
     DEBUG = False
     TESTING = False
@@ -8,19 +10,19 @@ class Config:
     }
     STATHAT_EZ_KEY = 'o3OaE05mySW3g9RH'
     SECRET_KEY = 'v4w2016stevens'
-    SERVER = 'localhost:8000'
+    SERVER = 'http://localhost:8000'
 
 
 class ProductionConfig(Config):
-    SERVER = 'vets.cawleyedwards.com/api'
+    SERVER = 'https://vets.cawleyedwards.com/api'
     # SERVER_NAME = 'vets.cawleyedwards.com/api'
 
 
 class LocalConfig(Config):
     DEBUG = True
-    SERVER = 'localhost:8000'
+    SERVER = 'http://localhost:' + os.getenv('VETS_PORT', '5000')
 
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SERVER = 'localhost'
+    SERVER = 'http://localhost'
